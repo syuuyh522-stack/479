@@ -523,7 +523,7 @@ const store=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const load=k=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return null}};
 const drop=k=>{try{localStorage.removeItem(k)}catch(e){}};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
-const fresh=()=>({scene:'relax',inv:[],f:{},hl:{},hints:0,el:0,mid:null,visited:['B1'],seenF:['B1'],night:false,bad:0,log:[],ev:{},started:false,done:false,light:false,manNew:false});
+const fresh=()=>({scene:'relax',inv:[],f:{rv:1},hl:{},hints:0,el:0,mid:null,visited:['B1'],seenF:['B1'],night:false,bad:0,log:[],ev:{},started:false,done:false,light:false,manNew:false});
 let S=fresh();
 let paused=true;
 const has=id=>S.inv.includes(id);
@@ -775,9 +775,9 @@ $('#mclose').onclick=()=>{sfx.tap();closeModal()};
 $('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 
 /* ================= 아이템 ================= */
-const DAY=['음료는 주문이 접수된 순서대로 만들어야 합니다. 순서가 바뀔 경우 주문자가 나타나지 않습니다.','22시 이후에는 보안 등급이 높은 카드만 작동합니다. 보안 등급이 낮다면 11층에서 등급 변경을 신청하세요.','라운지 초상화는 움직이지 않습니다. 만약 움직이는 초상화를 발견한다면 말을 걸지 마세요.','복합기는 2층에 있습니다.','이 건물에는 다른 회사 직원도 함께 근무합니다. 10시 이후에는 모두 퇴근하니, 근무시간 내에는 함께 이용하세요.','밤 12시 이후에 남아 있는 인원을 마주친다면 가까이하지 마십시오.','이미 가까이 갔다면 말을 걸지 마십시오.','밤 12시 이후 11층은 급행이 서지 않습니다. 부득이하게 급행을 이용한다면 엘리베이터 내부를 확인하세요. 가급적 이용하지 마세요.','엘리베이터 문이 고장 났다면 지침을 따르세요.'];
+const DAY=['음료는 주문이 접수된 순서대로 만들어 주세요. 순서가 바뀌면 주문자가 나타나지 않습니다.','22시 이후에는 보안 등급이 높은 카드만 작동합니다. 보안 등급이 낮다면 11층에서 등급 변경을 신청하세요.','라운지 초상화는 움직이지 않습니다. 움직이는 초상화를 발견하면 말을 걸지 마세요.','복합기는 2층에 있습니다.','이 건물에는 다른 회사 직원도 함께 근무합니다. 10시 이후에는 모두 퇴근하니, 근무시간에는 함께 이용해 주세요.','밤 12시 이후에 남아 있는 인원을 마주치면 가까이 가지 마십시오.','이미 가까이 갔다면 말을 걸지 마십시오.','누가 어떤 이름으로 부르든 대답하지 마십시오.','밤 12시 이후 11층에는 급행이 서지 않습니다. 부득이하게 급행을 탔다면 엘리베이터 안을 확인하세요. 되도록 타지 마세요.','엘리베이터 문이 고장 나면 지침을 따르세요.'];
 const MIRROR={4:1};
-const NIGHT={3:'초상화는 움직입니다. 액자 밖으로 나온 것과는 말을 섞지 마십시오.',4:'2층 복합기에서 찾지 마십시오.',5:'10시 이후 엘리베이터에 타고 있는 사람은 직원이 아닙니다. 먼저 보내십시오.',6:'남아 있는 인원은 가장 높은 자리에 앉아 있습니다.',7:'이미 가까이 갔다면 들어온 길로 돌아가지 마십시오.',8:'급행 안에는 이미 누가 타고 있습니다.',9:'버튼 위 메모는 지침이 아닙니다. 닫힘을 누르십시오.'};
+const NIGHT={3:'초상화는 움직입니다. 액자 밖으로 나온 것과는 말을 섞지 마십시오.',4:'2층 복합기에서 찾지 마십시오.',5:'10시 이후 엘리베이터에 타고 있는 사람은 직원이 아닙니다. 먼저 보내십시오.',6:'남아 있는 인원은 가장 높은 자리에 앉아 있습니다.',7:'이미 가까이 갔다면 들어온 길로 돌아가지 마십시오.',9:'급행 안에는 이미 누가 타고 있습니다.',10:'버튼 위 메모는 지침이 아닙니다. 닫힘을 누르십시오.'};
 const ITEMS={
   manual:{n:'낮 매뉴얼',d:'카페 데스크에 있던 종이. 슬기로운 회사생활 라운지 직원용.',v:()=>openManual('day'),c:'#ece5d3'},
   manualN:{n:'야간 근무자용 매뉴얼',d:'5층 복합기가 끝없이 뱉어내던 종이.',v:()=>openManual('night'),c:'#b9b3a4'},
@@ -1770,7 +1770,7 @@ function go(id,keep){
   if(sc.fl!=='EV'){if(!S.seenF.includes(sc.fl)){S.seenF.push(sc.fl);chapter(sc.fl,sc.chap||sc.nm)}if(!S.visited.includes(sc.fl))S.visited.push(sc.fl)}
   sc.enter&&sc.enter();render();save();sfx.step();
 }
-function heal(){const f=S.f;if(!f)return;const sc=SC[S.scene];S.inv=S.inv.filter(x=>x!=='manualN');if(S.ev&&S.ev.ending===1)S.ev.mcTalk=0;if(S.ev&&S.ev.ending===3)S.ev.ending=2;
+function heal(){const f=S.f;if(!f)return;if(!f.rv){if(f.red){const r={};Object.keys(f.red).forEach(k=>{const n=+k;r[n>=8?n+1:n]=1});f.red=r}f.rv=1}const sc=SC[S.scene];S.inv=S.inv.filter(x=>x!=='manualN');if(S.ev&&S.ev.ending===1)S.ev.mcTalk=0;if(S.ev&&S.ev.ending===3)S.ev.ending=2;
   if(S.night&&sc&&sc.fl==='1F')S.scene='f8hall';
   if(!S.night&&has('card8'))f.expOpen=1;
   if(has('card8')&&!has('keyD')&&!has('peter'))S.inv.push('keyD');
@@ -1795,11 +1795,11 @@ function expressBounce(){
       if(f==='16'){sfx.tick();say('불이 잠깐 들어왔다 꺼진다. 표시창에 작게: 고정석 없음.','s');return}
       if(f!=='11'){sfx.tick();say('버튼 불이 들어왔다 바로 꺼진다.');return}
       bt.classList.add('hot1');closeModal();sfx.door();say('문이 닫힌다.');sfx.move();buzz(300);evFake();
-      later(()=>{$('#evd').classList.remove('on');sfx.dingLow();S.f.expBounce=1;S.f.headTurn=1;redPen(8);render();say('문이 열린다. 8층이다. 방금 표시창에 뜬 2는 이 건물에 없는 층이다.','w');say('바닥에 떨어진 해골 머리가 엘리베이터 쪽을 보고 있다.','w');save();reg8()},5600)};g.appendChild(bt)});b.appendChild(g)});
+      later(()=>{$('#evd').classList.remove('on');sfx.dingLow();S.f.expBounce=1;S.f.headTurn=1;redPen(9);render();say('문이 열린다. 다시 8층이다.','w');say('바닥에 떨어진 해골 머리가 엘리베이터 쪽을 보고 있다.','w');save();reg8()},5600)};g.appendChild(bt)});b.appendChild(g)});
 }
 function evFake(){let d=$('#evd');if(!d){d=el('div','');d.id='evd';d.innerHTML='<b></b><small></small>';document.body.appendChild(d)}const n=d.querySelector('b'),c=d.querySelector('small');c.textContent='';d.className='on';n.className='';
   [['8',0],['9',800],['10',1600]].forEach(([t,ms])=>later(()=>{n.textContent=t;sfx.tick()},ms));
-  later(()=>{n.textContent='';try{sfx.static()}catch(e){}},2500);later(()=>{n.textContent='2';n.className='red';$('#app').classList.remove('flick');void $('#app').offsetWidth;$('#app').classList.add('flick');sfx.ding();buzz([80,60,200]);c.textContent='2층입니다.'},2900);
+  later(()=>{n.textContent='';try{sfx.static()}catch(e){}},2500);later(()=>{$('#app').classList.remove('flick');void $('#app').offsetWidth;$('#app').classList.add('flick');buzz([80,60,200])},2900);
   later(()=>{n.className='';c.textContent='';n.textContent='8'},4500);setTimeout(()=>d.classList.remove('on'),6200)}
 function reg8(){if(has('peter')&&S.f.expBounce&&S.f.paperDone&&!S.f.reg8){S.f.reg8=1;save();later(()=>{sfx.ding();render();say('등 뒤에서 도착음. 일반 엘리베이터 문이 열려 있다.','w');save()},1600)}}
 function skull(){
@@ -1845,8 +1845,8 @@ function tension(){if(D.tenT)return;let n=0;const tick=()=>{D.tenT=null;if(S.sce
 
 /* ================= 모달 콘텐츠 ================= */
 function redPen(n){S.f.red=S.f.red||{};if(S.f.red[n])return;S.f.red[n]=1;if(has('manual')||has('manualN'))S.manNew=true;dock();save();tone(1800,.08,{v:.03,type:'triangle',at:.3,rv:.3})}
-function openAccessLog(close){const me=myName();modal('바닥의 출력물',b=>{const rows=[];for(let y=2009;y<=2026;y++){rows.push('<tr><td>'+y+'.08.05</td><td>박범기</td><td>23:59</td><td>기록 없음</td></tr>');}
-  rows.push('<tr class="me"><td>2026.10.29</td><td>'+me+'</td><td>23:50</td><td>기록 없음</td></tr>');
+function openAccessLog(close){const me=myName();if(!S.f.day)S.f.day=Date.now();const td=new Date(S.f.day),tds=td.getFullYear()+'.'+pad2(td.getMonth()+1)+'.'+pad2(td.getDate());modal('바닥의 출력물',b=>{const rows=[];for(let y=2016;y<=2026;y++){rows.push('<tr><td>'+y+'.08.05</td><td>박범기</td><td>23:59</td><td>기록 없음</td></tr>');}
+  rows.push('<tr class="me"><td>'+tds+'</td><td>'+me+'</td><td>23:50</td><td>기록 없음</td></tr>');
   b.appendChild(el('div','paper alog','<h3>보안 출력 / 야간 출입 기록</h3><table><tr><th>날짜</th><th>이름</th><th>입실</th><th>퇴실</th></tr>'+rows.join('')+'</table><div class="foot">승인자: MC (14F 고정석)<br>퇴실 승인 대기 1건</div>'))},close)}
 function openManual(which,close){
   S.manN=(S.manN||0)+1;S.manNew=false;dock();
@@ -2182,7 +2182,7 @@ function treeCanvas(){const W=980,H=560;return pc(W,H,x=>{let sd=4793;const R=()
   txt('피터 퇴사 여행 후보. 결국 못 고르고 나갔다.',W-24,H-24,22,'#8a2f2a',HD,'right');
   // 자석
   [[18,14],[W-34,16]].forEach(([mx,my])=>{x.fillStyle='rgba(0,0,0,.18)';x.beginPath();x.arc(mx+9,my+11,9,0,7);x.fill();x.fillStyle='#d9534a';x.beginPath();x.arc(mx+8,my+9,9,0,7);x.fill()})})}
-function openTree(){S.f.treeEnd=1;modal('화이트보드',b=>{const w=el('div','wbwrap');let c=treeCanvas();if(document.fonts&&document.fonts.load)document.fonts.load('40px "Nanum Pen Script"').then(()=>{const c2=treeCanvas();c2.style.cssText=c.style.cssText;c.replaceWith(c2);c=c2}).catch(()=>{});c.style.width='980px';c.style.height='560px';w.appendChild(c);b.appendChild(w);b.appendChild(el('p','note','옆으로 밀어서 전체를 본다. 빨간 동그라미 칸만 비어 있다.'))})}
+function openTree(){S.f.treeEnd=1;modal('화이트보드',b=>{const w=el('div','wbwrap');let c=treeCanvas();if(document.fonts&&document.fonts.load)document.fonts.load('40px "Nanum Pen Script"').then(()=>{const c2=treeCanvas();c2.style.cssText=c.style.cssText;c.replaceWith(c2);c=c2}).catch(()=>{});c.style.width='980px';c.style.height='560px';w.appendChild(c);b.appendChild(w);b.appendChild(el('p','note','옆으로 밀어서 전체를 본다. 빨간 동그라미 칸만 비어 있다.'))},()=>{if(!S.f.treeSay){S.f.treeSay=1;save();say('어느 나라지..? 해당 회의실을 찾아봐야 하나.','v')}})}
 function openPanel(){
   const fr=S.ev.elevFrom;
   modal('버튼 패널',b=>{
@@ -2204,7 +2204,7 @@ function openPanel(){
     plate.appendChild(g);const sl=el('div','eslot');sl.style.cssText='height:34px;display:flex;flex-direction:column;justify-content:center;gap:4px';plate.appendChild(sl);b.appendChild(plate);
     const r=el('div','erow');const o=el('button','','<i>◀▶</i>열림');const c=el('button','','<i>▶◀</i>닫힘');
     o.onclick=()=>{if(paused)return;if(S.f.e14){$('#app').classList.remove('alarm');bad('open');return}say('문이 열린 채로 있다.')};
-    c.onclick=()=>{if(paused)return;if(S.f.e14){S.f.e14=0;$('#app').classList.remove('alarm');closeModal();redPen(9);say('닫힘을 누른다. 문이 닫힌다.');sfx.door();travel('14','f14hall','엘리베이터가 올라간다.');return}say('문이 닫혔다 다시 열린다. 갈 층을 먼저 눌러야 한다.')};
+    c.onclick=()=>{if(paused)return;if(S.f.e14){S.f.e14=0;$('#app').classList.remove('alarm');closeModal();redPen(10);say('닫힘을 누른다. 문이 닫힌다.');sfx.door();travel('14','f14hall','엘리베이터가 올라간다.');return}say('문이 닫혔다 다시 열린다. 갈 층을 먼저 눌러야 한다.')};
     r.append(o,c);plate.appendChild(r);
   });
 }
@@ -2217,7 +2217,7 @@ function panelCanvas(fl,lit,k=1){return pc(64*k,352*k,x=>{x.imageSmoothingEnable
 function keypadMirror(small,on=true){const k=4,src=panelCanvas(S.ev.elevFrom||'',on?'5':null,k);return pc(64*k,352*k,x=>{x.translate(64*k,0);x.scale(-1,1);x.drawImage(src,0,0)})}
 function hiTex(cv){const t=new THREE.CanvasTexture(cv);t.minFilter=THREE.LinearMipmapLinearFilter;t.magFilter=THREE.LinearFilter;t.anisotropy=4;return t}
 function openMirror(on=true){const q=myQ();modal('거울',b=>{if(q&&q.mirror){b.appendChild(el('div','sayin',(ME?ME.n:'나')+' | '+q.mirror[Math.floor(Math.random()*q.mirror.length)]));tone(880,.07,{type:'triangle',v:.05,to:1500,rv:.2})}b.appendChild(el('p','note',on?'어두운 거울에 문 옆 버튼 패널이 비친다. 버튼 하나에 불이 들어와 있다.':'어두운 거울에 문 옆 버튼 패널이 비친다.'));const m=el('div','mirror');m.appendChild(keypadMirror(false,on));b.appendChild(m);if(on)S.f.mirror=1})}
-function openTerminal(){modal('리셉션 보안 단말기',b=>{b.appendChild(el('div','logv','<p><b>보안 등급 갱신 보류</b></p><p>승인서 확인 필요</p><p>출력 대기 문서 1건 (수신: null)</p><p>출력 위치: 2F 복합기</p>'));b.appendChild(el('div','paper','<span style="font-family:var(--disp);font-size:16px">출력물 확인 필요</span><div class="foot">화면 아래에 볼펜으로 쓴 메모</div>'));S.f.term=1})}
+function openTerminal(){modal('리셉션 보안 단말기',b=>{b.appendChild(el('div','logv','<p><b>보안 등급 갱신 보류</b></p><p>승인서 확인 필요</p><p>출력 대기 문서 1건 (수신: null)</p><p>출력 위치: 2F 복합기</p>'));b.appendChild(el('div','paper','<span style="font-family:\'Nanum Pen Script\',cursive;font-size:30px;line-height:1.2;color:#1d3f8a;display:inline-block;transform:rotate(-2deg)">출력물 확인 필요</span>'));S.f.term=1})}
 function openWhiteboard(){
   modal('화이트보드',b=>{
     b.appendChild(el('p','note',S.light?'손전등을 비춘다. 화면을 문질러 빛을 옮긴다.':'너무 어두워서 보이지 않는다. 손전등을 켜야 한다.'));
@@ -2245,7 +2245,7 @@ function openDial(){
   });
 }
 function docSVG(){return `<rect width="240" height="300" fill="#e7e0cf"/><g stroke="#5a5348" stroke-width="1.3" fill="none"><rect x="10" y="10" width="220" height="280"/><line x1="10" y1="70" x2="230" y2="70"/><line x1="10" y1="110" x2="230" y2="110"/><line x1="10" y1="150" x2="230" y2="150"/><line x1="10" y1="190" x2="230" y2="190"/><line x1="66" y1="70" x2="66" y2="190"/><line x1="160" y1="10" x2="160" y2="70"/></g>
-<text x="52" y="30" font-size="9" fill="#5a5348" font-family="IBM Plex Sans KR">작성일자</text><text x="58" y="52" font-size="15" fill="#1c1813" font-family="IBM Plex Mono" font-weight="600">2009.</text><rect x="16" y="42" width="34" height="12" fill="#857a68" opacity=".6" filter="url(#bl)"/>
+<text x="52" y="30" font-size="9" fill="#5a5348" font-family="IBM Plex Sans KR">작성일자</text><text x="58" y="52" font-size="15" fill="#1c1813" font-family="IBM Plex Mono" font-weight="600">2016.</text><rect x="16" y="42" width="34" height="12" fill="#857a68" opacity=".6" filter="url(#bl)"/>
 <text x="128" y="46" font-size="18" fill="#1c1813" font-family="Gowun Batang" text-anchor="middle" font-weight="700">사직서</text>
 <text x="196" y="30" font-size="9" fill="#5a5348" text-anchor="middle">결재</text>
 <text x="20" y="95" font-size="10" fill="#5a5348">기안자</text><rect x="80" y="82" width="120" height="16" fill="#6f6556" opacity=".6" filter="url(#bl)"/>
@@ -2271,11 +2271,11 @@ function openScraps(){
       if(!tray.children.length)tray.appendChild(el('span','note','조각을 모두 놓았다.'))};
     const rs=el('button','btn ghost','조각 모두 되돌리기');rs.onclick=()=>{st.place={};sel=null;sfx.paper();draw()};b.appendChild(rs);
     tray.onclick=()=>{if(sel==null)return;const old=slotOf(sel);if(old>=0){delete st.place[old];sel=null;draw()}};
-    const check=()=>{const ok=[0,1,3,4,5,6,7,8].every(p=>st.place[p]===p&&st.rot[p]===0);if(ok){S.f.paperDone=1;take('scraps');give('doc09');closeModal();reg8();say('조각이 맞물린다. 사직서다. 이름도 사유도 번져서 읽을 수 없다. 연도만 선명하다. 2009.');say('결재란이 있어야 할 오른쪽 위 조각만 끝내 없다.','v')}};
+    const check=()=>{const ok=[0,1,3,4,5,6,7,8].every(p=>st.place[p]===p&&st.rot[p]===0);if(ok){S.f.paperDone=1;take('scraps');give('doc09');closeModal();reg8();say('조각이 맞물린다. 사직서다. 이름도 사유도 번져서 읽을 수 없다. 연도만 선명하다. 2016.');say('결재란이 있어야 할 오른쪽 위 조각만 끝내 없다.','v')}};
     draw();
   });
 }
-function openDoc09(){modal('맞춘 사직서',b=>{const d=el('div');d.innerHTML=`<svg viewBox="0 0 240 300" style="width:100%;max-width:300px;display:block;margin:0 auto;border:3px solid #000"><defs><filter id="bl"><feGaussianBlur stdDeviation="2"/></filter></defs>${docSVG()}<path d="M160 0h80v100h-80l6 -20l-6 -18l8 -22l-6 -20z" fill="#12141a"/></svg>`;b.appendChild(d);b.appendChild(el('p','note','연도만 선명하다. 2009.'))})}
+function openDoc09(){modal('맞춘 사직서',b=>{const d=el('div');d.innerHTML=`<svg viewBox="0 0 240 300" style="width:100%;max-width:300px;display:block;margin:0 auto;border:3px solid #000"><defs><filter id="bl"><feGaussianBlur stdDeviation="2"/></filter></defs>${docSVG()}<path d="M160 0h80v100h-80l6 -20l-6 -18l8 -22l-6 -20z" fill="#12141a"/></svg>`;b.appendChild(d);b.appendChild(el('p','note','연도만 선명하다. 2016.'))})}
 function resignHTML(o={}){if(!S.f.day)S.f.day=Date.now();const t=new Date(S.f.day),d=t.getFullYear()+'-'+pad2(t.getMonth()+1)+'-'+pad2(t.getDate());const me=ME?ME.n:'나';
   const ck=(txt)=>'<tr><td class="ck">'+txt+'</td><td class="cb">☑</td></tr>';
   return `<div class="rform"><h3>사직서</h3>
@@ -2283,8 +2283,8 @@ function resignHTML(o={}){if(!S.f.day)S.f.day=Date.now();const t=new Date(S.f.da
   <table class="rsign"><tr><th rowspan="2" class="v">결재</th><th class="h">기안</th><th class="h">MC</th></tr><tr><td class="st"><span class="stamp">박범기</span></td><td class="st">${o.approved?'<span class="stamp red">승인</span>':''}</td></tr></table></div>
   <table class="rinfo w"><tr><th>제목</th><td class="rf-t">[사직서] 박범기 (퇴근일)</td></tr></table>
   <p class="rnote">☑ 마지막 근무일까지 결재가 완료되면 본 사직서를 출력하여 원본 제출해야 합니다.</p>
-  <table class="rbody"><tr><th>이름</th><td>박범기</td><th>생년월일</th><td>YYYY-MM-DD</td></tr><tr><th>입사일</th><td>2009-..-..</td><th>퇴사일</th><td>${d}</td></tr><tr><th>사직사유</th><td>퇴근</td><th>업무인수자</th><td>${o.taker?me:''}</td></tr></table>
-  <table class="rck">${ck('회사는 업무 인수인계의 필요에 따라 퇴사일을 지정할 수 있습니다.')}${ck('2009년부터 매주 월요일 재논의에 참석하였습니다. 이번 주는 참석하지 않겠습니다.')}${ck('인수인계를 완료하였습니다.')}</table></div>`}
+  <table class="rbody"><tr><th>이름</th><td>박범기</td><th>생년월일</th><td>YYYY-MM-DD</td></tr><tr><th>입사일</th><td>2016-..-..</td><th>퇴사일</th><td>${d}</td></tr><tr><th>사직사유</th><td>퇴근</td><th>업무인수자</th><td>${o.taker?me:''}</td></tr></table>
+  <table class="rck">${ck('회사는 업무 인수인계의 필요에 따라 퇴사일을 지정할 수 있습니다.')}${ck('2016년부터 매주 월요일 재논의에 참석하였습니다. 이번 주는 참석하지 않겠습니다.')}${ck('인수인계를 완료하였습니다.')}</table></div>`}
 function openDoc26(){modal('사직서',b=>{b.appendChild(el('div','',resignHTML({taker:1})))})}
 function cctvData(){const sk=S.ev.skull||420;const g=sk>=90?sk-30:sk*.6;const f=Math.min(1,g/330);const t=x=>fmt(86400+Math.round(x),true);
   return[['B1-03','23:58:12','wall'],['B1-03',t(41*f),'empty'],['B1-03',t(67*f),'stand'],['1F-01',t(200*f),'guard'],['1F-02',t(290*f),'evdoor'],['EV-04',t(330*f),'evin'],['8F-02',t(sk),'sofa'],['8F-02',t(sk+35),'look'],['8F-02',t(sk+36),'face']]}
@@ -2374,7 +2374,7 @@ function scare(){
       onClose=()=>{render();save()}},900);render();save()},1300);
 }
 function openLog(){
-  const L=[['2009','박범기는 퇴근 처리되지 않습니다.'],['2010','퇴근 태그는 1층에서만 찍힙니다.'],['2012','엘리베이터에 먼저 탄 사람에게 몇 층 가시냐고 묻지 마십시오.'],['2014','회의는 다음 주 월요일에 다시 잡습니다.'],['2015','2층은 없습니다. 출력물은 거기서 나옵니다.'],['2018','결재자는 바뀌어도 결재는 남습니다.'],['2020','재택근무 기간에도 박범기는 출근 처리됩니다.'],['2023','자율 좌석제 시행. 박범기의 자리는 반납되지 않습니다.'],['2025','안마의자는 20분을 넘기지 마십시오.'],['2026','문을 두드리는 소리에 대답하지 마십시오.']];
+  const L=[['2016','박범기는 퇴사 처리되지 않습니다.'],['2017','박범기는 퇴사 처리되지 않습니다.'],['2018','재택근무를 시행합니다.'],['2019','박범기는 퇴사 처리되지 않습니다.'],['2020','박범기는 퇴사 처리되지 않습니다.'],['2021','박범기는 퇴사 처리되지 않습니다.'],['2022','박범기는 퇴사 처리되지 않습니다.'],['2023','박범기는 퇴사 처리되지 않습니다.'],['2025','재택근무 횟수 제한을 시행합니다.'],['2026','박범기는 퇴사 처리되지 않습니다.']];
   modal('사내 안내문 작성 로그',b=>{
     const v=el('div','logv');v.innerHTML=L.map(([y,t])=>'<p><b>'+y+'</b> 작성자 박범기<br>'+t+'</p>').join('')+'<p style="color:#6b7f90">끝</p>';const cue=el('div','logcue','▼');b.appendChild(monWin('사내 안내문 작성 로그',v,cue));v.addEventListener('scroll',()=>{if(v.scrollTop+v.clientHeight>=v.scrollHeight-6)cue.hidden=true});
     let fired=false;const fire=()=>{if(fired)return;fired=true;S.f.logEnd=1;later(()=>{closeModal();S.f.knock1=1;save();knockChoice()},2600)};
@@ -2426,9 +2426,9 @@ const HINTS={
  f5c:['복합기가 카드를 요구합니다.','보안 출력입니다. 등급이 높은 카드가 필요합니다.','복합기를 누르고 보안 등급 카드를 대세요.'],
  f5d:['출력물은 기록입니다.','캡처를 끌어서 1번 칸부터 시간 순서대로 놓으세요.','23:58이 가장 이릅니다. 그다음은 자정 이후 시각 순서입니다. 8칸을 다 채우고 묶으세요.'],
  f5e:['매뉴얼 6번의 빨간 글씨와 MC 카드 뒷면을 보세요.','가장 높은 자리, 고정석 14F입니다. 엘리베이터 홀로 가세요.','매뉴얼 5번을 보세요. 10시 이후 누가 탄 엘리베이터는 먼저 보내세요.'],
- f5f:['문이 닫히지 않습니다. 서두르세요.','매뉴얼 9번의 빨간 글씨를 읽으세요. 버튼 위 메모는 지침이 아닙니다.','패널에서 닫힘 버튼을 누르세요.'],
+ f5f:['문이 닫히지 않습니다. 서두르세요.','매뉴얼 10번의 빨간 글씨를 읽으세요. 버튼 위 메모는 지침이 아닙니다.','패널에서 닫힘 버튼을 누르세요.'],
  f14a:['14층 출입문과 MC방 문에 맞는 카드가 따로 있습니다.','출입문은 보안 등급 카드, 방문은 MC 카드입니다.','MC방 문을 누르고 MC 카드를 대세요.'],
- f14b:['모니터를 보세요.','로그를 끝까지 읽으세요. 마지막 줄을 기억하세요.','누가 부르든 대답하지도, 열지도 마세요. 가만히 있으세요.'],
+ f14b:['모니터를 보세요.','매뉴얼 8번을 다시 읽으세요.','누가 부르든 대답하지도, 열지도 마세요. 가만히 있으세요.'],
  f14d:['긴장이 풀렸습니다. 쉬어도 됩니다.','MC의 자리는 비어 있습니다.','의자에 앉으세요.'],
  f14c:['모니터에 결재 대기 문서가 있습니다.','승인 버튼은 짧게 눌러서는 처리되지 않습니다.','승인 버튼을 3초 동안 누르고 있으세요. 그다음 의자에 앉으세요.']
 };
@@ -2572,21 +2572,23 @@ function titleArt(){return pc(160,100,x=>{const P=(c,a,b,w=1,h=1)=>px(x,c,a,b,w,
   P('#000',118,2,32,11);P('#000',118,2,38,11);gl57(x,'2',121,4,'#ff3b2a');gl57(x,'3',127,4,'#ff3b2a');P('#ff3b2a',134,5,1,1);P('#ff3b2a',134,9,1,1);gl57(x,'5',137,4,'#ff3b2a');gl57(x,'9',143,4,'#ff3b2a');
   // 비네트
   for(let i=0;i<10;i++){x.fillStyle='rgba(0,0,0,'+(.08)+')';x.fillRect(0,0,160-i*0,i);x.fillRect(0,99-i,160,1);x.fillRect(i,0,1,100);x.fillRect(159-i,0,1,100)}})}
-function titleLogo(){const W=150,H=64,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const F="900 25px 'Black Han Sans','Noto Sans CJK KR Black','Noto Sans KR','Do Hyeon',sans-serif";
+function titleLogo(){const K=2,W=150*K,H=64*K,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+  const F="900 "+(25*K)+"px 'Black Han Sans','Noto Sans CJK KR Black','Noto Sans KR','Do Hyeon',sans-serif";
   const t=document.createElement('canvas');t.width=W;t.height=H;const y=t.getContext('2d');y.font=F;y.textBaseline='alphabetic';
-  const draw=(col1,col2)=>{y.clearRect(0,0,W,H);y.fillStyle=col1;y.fillText('479',4,27);const w=y.measureText('479').width;y.fillStyle=col2;y.fillText('에서',4+w+2,27);y.fillText('뜻밖의 야근',4,57)};
+  const SP=1.6*K;const put=(s,x0,y0,col)=>{y.fillStyle=col;let cx=x0;for(const ch of s){y.fillText(ch,cx,y0);cx+=y.measureText(ch).width+(ch===' '?0:SP)}return cx};
+  const draw=(col1,col2)=>{y.clearRect(0,0,W,H);const e=put('479',4*K,27*K,col1);put('에서',e+3*K,27*K,col2);put('뜻밖의 야근',4*K,57*K,col2)};
   draw('#e0822f','#f2ece0');const id=y.getImageData(0,0,W,H),d=id.data;
   for(let i=0;i<d.length;i+=4){if(d[i+3]>110){d[i+3]=255}else d[i+3]=0}
   const on=(px,py)=>px>=0&&py>=0&&px<W&&py<H&&d[(py*W+px)*4+3]>0;
+  const near=(px,py,r)=>{for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++)if((i||j)&&on(px+i,py+j))return true;return false};
+  const sh=(px,py)=>{for(let j=K;j<=2*K;j++)for(let i=K;i<=2*K;i++)if(on(px-i,py-j))return true;return false};
   const o=x.createImageData(W,H),q=o.data;
   for(let py=0;py<H;py++)for(let px=0;px<W;px++){const k=(py*W+px)*4;
-    if(on(px,py)){const top=!on(px,py-1);q[k]=d[k];q[k+1]=d[k+1];q[k+2]=d[k+2];q[k+3]=255;if(top){q[k]=Math.min(255,d[k]+25);q[k+1]=Math.min(255,d[k+1]+25);q[k+2]=Math.min(255,d[k+2]+25)}else if(!on(px,py+1)){q[k]=d[k]*.72;q[k+1]=d[k+1]*.72;q[k+2]=d[k+2]*.72}}
-    else if(on(px-1,py)||on(px+1,py)||on(px,py-1)||on(px,py+1)||on(px-1,py-1)||on(px+1,py-1)||on(px-1,py+1)||on(px+1,py+1)){q[k]=8;q[k+1]=6;q[k+2]=6;q[k+3]=255}
-    else if(on(px-2,py-2)||on(px-1,py-2)||on(px-2,py-1)){q[k]=60;q[k+1]=14;q[k+2]=10;q[k+3]=255}}
+    if(on(px,py)){let top=false,bot=false;for(let s=1;s<=K;s++){if(!on(px,py-s))top=true;if(!on(px,py+s))bot=true}q[k]=d[k];q[k+1]=d[k+1];q[k+2]=d[k+2];q[k+3]=255;if(top){q[k]=Math.min(255,d[k]+25);q[k+1]=Math.min(255,d[k+1]+25);q[k+2]=Math.min(255,d[k+2]+25)}else if(bot){q[k]=d[k]*.72;q[k+1]=d[k+1]*.72;q[k+2]=d[k+2]*.72}}
+    else if(near(px,py,K)){q[k]=8;q[k+1]=6;q[k+2]=6;q[k+3]=255}
+    else if(sh(px,py)){q[k]=60;q[k+1]=14;q[k+2]=10;q[k+3]=255}}
   x.putImageData(o,0,0);
-  [[96,4],[118,9],[138,3]].forEach(([a,b])=>{x.fillStyle='#000';x.fillRect(a,b,4,2);x.fillRect(a-2,b-1,2,1);x.fillRect(a+4,b-1,2,1);x.fillRect(a-3,b-2,1,1);x.fillRect(a+6,b-2,1,1)});
-  
+  [[96,4],[118,9],[138,3]].forEach(([a,b])=>{x.fillStyle='#000';const R=(p,r,w,h)=>x.fillRect(p*K,r*K,w*K,h*K);R(a,b,4,2);R(a-2,b-1,2,1);R(a+4,b-1,2,1);R(a-3,b-2,1,1);R(a+6,b-2,1,1)});
   return c}
 function title(){
   paused=true;const s=$('#screen');s.hidden=false;s.innerHTML='';const inn=el('div','inner');
@@ -2618,14 +2620,14 @@ const DEV=[
  ['8층 도착','f8hall',{night:1,inv:['manual','badge','journal','card8','keyD'],f:{loungeOpen:1,journal:1},vis:['B1','1F']}],
  ['8층 피터 카드 뒤','f8lounge',{night:1,inv:['manual','badge','journal','card8','doc09','peter','tree'],f:{loungeOpen:1,journal:1,door8:1,skull:2,scrapsTaken:1,paperDone:1,treeEnd:1,r800:1},vis:['B1','1F','8F']}],
  ['8층 일반 엘리베이터 안','elev',{night:1,ev:{elevFrom:'8'},inv:['manual','badge','journal','card8','doc09','peter','tree'],f:{loungeOpen:1,journal:1,door8:1,skull:2,scrapsTaken:1,paperDone:1,treeEnd:1,expBounce:1,reg8:1,headTurn:1,red:{5:1}},vis:['B1','1F','8F']}],
- ['11층 일반 엘리베이터 안','elev',{night:1,ev:{elevFrom:'11'},inv:['manual','badge','doc09','peter','tree','sec','mc'],f:{door8:1,skull:2,paperDone:1,treeEnd:1,expBounce:1,reg8:1,door11:1,gRes:1,gIn:1,boxOpen:1,wbSeen:1,term:1,red:{5:1,8:1}},vis:['B1','1F','8F','11F']}],
+ ['11층 일반 엘리베이터 안','elev',{night:1,ev:{elevFrom:'11'},inv:['manual','badge','doc09','peter','tree','sec','mc'],f:{door8:1,skull:2,paperDone:1,treeEnd:1,expBounce:1,reg8:1,door11:1,gRes:1,gIn:1,boxOpen:1,wbSeen:1,term:1,red:{5:1,9:1}},vis:['B1','1F','8F','11F']}],
  ['11층 도착','f11hall',{night:1,inv:['manual','badge','journal','card8','doc09','peter','tree'],f:{loungeOpen:1,journal:1,door8:1,skull:2,scrapsTaken:1,paperDone:1,treeEnd:1,expBounce:1,reg8:1,headTurn:1,red:{5:1}},vis:['B1','1F','8F']}],
- ['11층 서류함 연 뒤','f11corr',{night:1,inv:['manual','badge','doc09','peter','tree','sec','mc'],f:{door8:1,skull:2,paperDone:1,treeEnd:1,expBounce:1,reg8:1,door11:1,gRes:1,gIn:1,boxOpen:1,wbSeen:1,term:1,red:{5:1,8:1}},vis:['B1','1F','8F','11F']}],
- ['5층 도착','f5corr',{night:1,inv:['manual','badge','doc09','peter','sec','mc'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,term:1,mirror:1,red:{5:1,8:1}},vis:['B1','1F','8F','11F']}],
- ['5층 출력 뒤 (엘리베이터)','f5corr',{night:1,inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,red:{4:1,5:1,7:1,8:1}},vis:['B1','1F','8F','11F','5F'],at:[13,18]}],
- ['5층 일반 엘리베이터 안','elev5',{night:1,ev:{elevFrom:'5'},inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,cp5:1,e5:4,red:{4:1,5:1,7:1,8:1}},vis:['B1','1F','8F','11F','5F']}],
- ['14층 도착','f14hall',{night:1,inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,cp5:1,e5:4,red:{4:1,5:1,6:1,7:1,8:1,10:1}},vis:['B1','1F','8F','11F','5F']}],
- ['MC방 안','mcroom',{night:1,inv:['manual','manualN','badge','sec','mc','doc26'],f:{door14:1,mcIn:1,mcEntry:'A',pr:'done',printed:1,red:{4:1,5:1,6:1,7:1,8:1,10:1}},vis:['B1','1F','8F','11F','5F','14F']}]];
+ ['11층 서류함 연 뒤','f11corr',{night:1,inv:['manual','badge','doc09','peter','tree','sec','mc'],f:{door8:1,skull:2,paperDone:1,treeEnd:1,expBounce:1,reg8:1,door11:1,gRes:1,gIn:1,boxOpen:1,wbSeen:1,term:1,red:{5:1,9:1}},vis:['B1','1F','8F','11F']}],
+ ['5층 도착','f5corr',{night:1,inv:['manual','badge','doc09','peter','sec','mc'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,term:1,mirror:1,red:{5:1,9:1}},vis:['B1','1F','8F','11F']}],
+ ['5층 출력 뒤 (엘리베이터)','f5corr',{night:1,inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,red:{4:1,5:1,7:1,9:1}},vis:['B1','1F','8F','11F','5F'],at:[13,18]}],
+ ['5층 일반 엘리베이터 안','elev5',{night:1,ev:{elevFrom:'5'},inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,cp5:1,e5:4,red:{4:1,5:1,7:1,9:1}},vis:['B1','1F','8F','11F','5F']}],
+ ['14층 도착','f14hall',{night:1,inv:['manual','manualN','badge','doc09','peter','sec','mc','doc26'],f:{door8:1,expBounce:1,reg8:1,door11:1,gRes:1,boxOpen:1,pr:'done',printed:1,cp5:1,e5:4,red:{4:1,5:1,6:1,7:1,9:1,10:1}},vis:['B1','1F','8F','11F','5F']}],
+ ['MC방 안','mcroom',{night:1,inv:['manual','manualN','badge','sec','mc','doc26'],f:{door14:1,mcIn:1,mcEntry:'A',pr:'done',printed:1,red:{4:1,5:1,6:1,7:1,9:1,10:1}},vis:['B1','1F','8F','11F','5F','14F']}]];
 function devPanel(){const s2=$('#screen');s2.hidden=false;s2.innerHTML='';const inn=el('div','inner');inn.appendChild(el('h2','pick-h','개발자 모드'));inn.appendChild(el('p','note','원하는 지점부터 바로 시작한다. 진행 저장은 덮어쓴다.'));
   let me=null;try{me=localStorage.getItem('tower479_me')}catch(e){}if(!MEMB[me])me='clark';
   DEV.forEach(([nm,sc,o])=>{const b=el('button','btn ghost',nm);b.style.width='100%';b.style.marginBottom='8px';b.onclick=()=>{aInit();S=fresh();applyMe(me);S.started=true;S.ev.pro=0;S.ev.epiDay=0;
