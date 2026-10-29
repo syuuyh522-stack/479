@@ -115,6 +115,8 @@ button:focus-visible{outline:3px solid var(--pump);outline-offset:2px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 
 #app.mopen #dlg{visibility:hidden}
+#rot{display:none}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){#rot{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--fg);font-family:var(--ui);font-size:18px;text-align:center;padding:24px}}
 @keyframes flick{0%,100%{filter:none}15%{filter:brightness(.15)}30%{filter:brightness(1.4)}45%{filter:brightness(.05)}60%{filter:brightness(.9)}80%{filter:brightness(.1)}}
 #app.flick #stage{animation:flick .65s steps(1) both}
 @keyframes dragfade{to{opacity:0;visibility:hidden}}
@@ -478,6 +480,7 @@ input[type=range]::-moz-range-thumb{width:22px;height:22px;background:#e0822f;bo
 @media (prefers-reduced-motion:reduce){.pin i,#clock.cap,#scare canvas,#scare canvas.rush,#dnext{animation:none}#app.shake{animation:none}}
 </style>
 
+<div id="rot">휴대폰을 세로로 돌려 주세요.</div>
 <div id="app">
   <div id="stage">
     <canvas id="gl"></canvas>
@@ -1107,7 +1110,7 @@ let lastF=0;function frame3(t){
   gfxFrame(t);gfxRender();
   const st=$('#stage');const cull=PL.on&&R3.cfg&&R3.cfg.follow;const w=st.clientWidth,h=st.clientHeight;const v=new THREE.Vector3();const dlgTop=h-($('#dlg').offsetHeight+16);
   const LB=[];R3.anch.forEach(a=>{v.set(a.p[0],a.p[1],a.p[2]).project(R3.cam);let x=(v.x+1)/2*w,y=(1-v.y)/2*h;const vis=v.z<1&&(!cull||Math.hypot(a.p[0]-PL.x,a.p[2]-PL.z)<6.5);a.el.style.display=vis?'':'none';if(!vis)return;const ew=a.el.offsetWidth/2||30,eh=a.el._h||(a.el._h=a.el.offsetHeight||48);x=Math.max(ew+12,Math.min(w-ew-12,x));y=Math.max(104+eh,Math.min(dlgTop-18,h-200,y));LB.push({a,x,y,ew,eh})});
-  LB.sort((p,q)=>p.y-q.y);const done=[];LB.forEach(b=>{for(let k=0;k<4;k++){let o=null,k2=0;for(;k2<3;k2++){o=done.find(d=>Math.abs(d.x-b.x)<d.ew+b.ew-4&&Math.abs(d.y-b.y)<26);if(!o)break;b.y=o.y+28}b.a.el.classList.toggle('nolab',k2>2&&!!o);break}done.push(b);b.a.el.style.transform=`translate(${b.x}px,${b.y}px) translate(-50%,-100%)`});hudTick(w,h,v);
+  LB.sort((p,q)=>p.y-q.y);const done=[],yMax=Math.min(dlgTop-18,h-200);LB.forEach(b=>{const need=d=>Math.max(d.eh,b.eh)-10,hit=()=>done.find(d=>Math.abs(d.x-b.x)<d.ew+b.ew-4&&Math.abs(d.y-b.y)<need(d));let o,n=0;while((o=hit())&&n<6){n++;const dn=o.y+need(o),up=o.y-need(o);b.y=(dn<=yMax||up<104+b.eh)?dn:up}done.push(b);b.a.el.style.transform=`translate(${b.x}px,${b.y}px) translate(-50%,-100%)`});hudTick(w,h,v);
 }
 function aimAt(cx,cy){if(!R3||!R3.g)return null;const st=$('#stage').getBoundingClientRect();const m=new THREE.Vector2((cx-st.left)/st.width*2-1,-((cy-st.top)/st.height)*2+1);R3.ray.setFromCamera(m,R3.cam);const hits=R3.ray.intersectObjects(R3.g.children,true);if(hits.length){R3.aim.copy(hits[0].point);return hits[0]}R3.aim.copy(R3.ray.ray.at(10,new THREE.Vector3()));return null}
 
@@ -2097,6 +2100,8 @@ const QUIRK={
   ella:{hop:0,inter:['이게 머람~?'],interP:.3,scare:['에엥!','이게 머람~?'],scareP:.6,idle:['집에 얼른 가고싶다','이게 머람~?'],idleP:1/45},
   nimo:{hop:0,idle:['앗 내 휴대폰이 어디갔지?!','이 시간이면 택시 타고 귀가할텐데','아~ 맥주마시고 싶다'],idleP:1/40,scare:['앗 내 휴대폰이 어디갔지?!'],scareP:.3},
   xia:{hop:1,talk:['헉!!','(움찔)','깜짝아...','꺅','놀랐잖아요 ㅠ'],talkP:.8,scare:['꺄악!!','헉!!!','(심장 떨어짐)','깜짝아...'],scareP:1,idle:['(움찔)','방금 누가 불렀어?','헉'],idleP:1/40},
+  lima:{hop:0,idle:['내가그린기린그림..','무서워 벌써 겁난다 ㅠㅠ'],idleP:1/40,scare:['무서워 벌써 겁난다 ㅠㅠ'],scareP:.5},
+  vana:{hop:0,idle:['내일 대응할 이슈가 몇개더라..','뭐지 이슈인가?!'],idleP:1/40,scare:['뭐지 이슈인가?!'],scareP:.5},
   sindy:{hop:0,inter:['뭐지 한번 더 봐야하나? 아 아닌가?'],interP:.35},
   eve:{hop:0,mirror:['웨모 췤~!'],scare:['헉 내 코트','이거 벽 밖에서 나는 소리 아니지?','조사병단이었으면 벌써 뛰어갔다','심장을 바쳐라...!'],idle:['이 셔츠 소재 진짜 좋다','오늘 착장 실패야','벽 안쪽은 안전한 거 맞지?','이 핏 미쳤다','다음 화 보고 싶다'],idleP:1/45,scareP:.6},
   paori:{hop:1,scare:['너무너무 놀랐다!!!!','ㅜㅜ 이게 무슨소리지','깜짝이야','깜짝이야!!','으악 ㅜㅜ'],idle:['깜짝이야','ㅜㅜ 이게 무슨소리지','방금 뭐였지?!','너무너무 놀랐다!!!!'],idleP:1/35,scareP:.85}
@@ -2104,10 +2109,10 @@ const QUIRK={
 const SECTEAM=['winner'];
 const SECQ={card:['이거 보안에 괜찮나..?','남의 카드 써도 되는 건가..?','출입 기록 남을 텐데..'],pc:['엠씨는 왜 PC를 안끄고 가신거지? 보안점수 마이너스..'],drawer:['서랍 잠금 상태 불량.. 보안점수 마이너스..','이거 보안에 괜찮나..?'],desk:['클린데스크 안 지켜졌네..'],idle:['이거 보안에 괜찮나..?'],idleP:1/60,scareP:.3,scare:['이거 보안에 괜찮나..?']};
 /* 같은 팀 동아리원: 성격이 따로 없는 캐릭터는 5~10분마다 팀원을 찾는다 */
-const TEAMS=[['sonya','shane','anna'],['mont','xia','sunny','indy','kayle','clark'],['liz','rabbit','lucian'],['rizzy','ella','henby'],['basil','dani','wayne'],['rubi','lucy','jeri']];
+const TEAMS=[['sonya','shane','anna'],['mont','xia','sunny','indy','kayle','clark'],['liz','rabbit','lucian'],['rizzy','ella','henby'],['basil','dani','wayne'],['rubi','lucy','jeri'],['hailey','트루']];
 function josa(n,a,b){const c=n.charCodeAt(n.length-1)-0xAC00;return n+(c>=0&&c<11172&&c%28?a:b)}
-function teamQ(){const k=S.me;if(QUIRK[k]||SECTEAM.includes(k))return null;const t=TEAMS.find(t=>t.includes(k));if(!t)return null;const ms=t.filter(x=>x!==k&&MEMB[x]);if(!ms.length)return null;
-  const n=MEMB[ms[Math.floor(Math.random()*ms.length)]].n;return{hop:0,team:1,idle:['아 '+n+' ㅠㅠ 어디계세요','내일 '+josa(n,'과','와')+' 미팅있는데..','우리팀 보고싶다']}}
+function teamQ(){const k=S.me;if(QUIRK[k]||SECTEAM.includes(k))return null;const t=TEAMS.find(t=>t.includes(k));if(!t)return null;const ms=t.filter(x=>x!==k&&(MEMB[x]||/[가-힣]/.test(x)));if(!ms.length)return null;
+  const pk=ms[Math.floor(Math.random()*ms.length)],n=MEMB[pk]?MEMB[pk].n:pk;return{hop:0,team:1,idle:['아 '+n+' ㅠㅠ 어디계세요','내일 '+josa(n,'과','와')+' 미팅있는데..','우리팀 보고싶다']}}
 function myQ(){if(!S||!S.me)return null;return QUIRK[S.me]||(SECTEAM.includes(S.me)?SECQ:null)||teamQ()}
 const BUB={t:'',until:0};
 function hopY(){if(!PL.hop)return 0;const d=(performance.now()-PL.hop)/1000;if(d>.55){PL.hop=0;return 0}return Math.sin(d/.55*Math.PI)*.75}
