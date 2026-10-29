@@ -2572,30 +2572,23 @@ function titleArt(){return pc(160,100,x=>{const P=(c,a,b,w=1,h=1)=>px(x,c,a,b,w,
   P('#000',118,2,32,11);P('#000',118,2,38,11);gl57(x,'2',121,4,'#ff3b2a');gl57(x,'3',127,4,'#ff3b2a');P('#ff3b2a',134,5,1,1);P('#ff3b2a',134,9,1,1);gl57(x,'5',137,4,'#ff3b2a');gl57(x,'9',143,4,'#ff3b2a');
   // 비네트
   for(let i=0;i<10;i++){x.fillStyle='rgba(0,0,0,'+(.08)+')';x.fillRect(0,0,160-i*0,i);x.fillRect(0,99-i,160,1);x.fillRect(i,0,1,100);x.fillRect(159-i,0,1,100)}})}
-function titleLogo(){const K=2,W=150*K,H=64*K,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  const F="900 "+(25*K)+"px 'Black Han Sans','Noto Sans CJK KR Black','Noto Sans KR','Do Hyeon',sans-serif";
-  const t=document.createElement('canvas');t.width=W;t.height=H;const y=t.getContext('2d');y.font=F;y.textBaseline='alphabetic';
-  const SP=1.6*K;const put=(s,x0,y0,col)=>{y.fillStyle=col;let cx=x0;for(const ch of s){y.fillText(ch,cx,y0);cx+=y.measureText(ch).width+(ch===' '?0:SP)}return cx};
-  const draw=(col1,col2)=>{y.clearRect(0,0,W,H);const e=put('479',4*K,27*K,col1);put('에서',e+3*K,27*K,col2);put('뜻밖의 야근',4*K,57*K,col2)};
-  draw('#e0822f','#f2ece0');const id=y.getImageData(0,0,W,H),d=id.data;
-  for(let i=0;i<d.length;i+=4){if(d[i+3]>110){d[i+3]=255}else d[i+3]=0}
-  const on=(px,py)=>px>=0&&py>=0&&px<W&&py<H&&d[(py*W+px)*4+3]>0;
-  const near=(px,py,r)=>{for(let j=-r;j<=r;j++)for(let i=-r;i<=r;i++)if((i||j)&&on(px+i,py+j))return true;return false};
-  const sh=(px,py)=>{for(let j=K;j<=2*K;j++)for(let i=K;i<=2*K;i++)if(on(px-i,py-j))return true;return false};
-  const o=x.createImageData(W,H),q=o.data;
-  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const k=(py*W+px)*4;
-    if(on(px,py)){let top=false,bot=false;for(let s=1;s<=K;s++){if(!on(px,py-s))top=true;if(!on(px,py+s))bot=true}q[k]=d[k];q[k+1]=d[k+1];q[k+2]=d[k+2];q[k+3]=255;if(top){q[k]=Math.min(255,d[k]+25);q[k+1]=Math.min(255,d[k+1]+25);q[k+2]=Math.min(255,d[k+2]+25)}else if(bot){q[k]=d[k]*.72;q[k+1]=d[k+1]*.72;q[k+2]=d[k+2]*.72}}
-    else if(near(px,py,K)){q[k]=8;q[k+1]=6;q[k+2]=6;q[k+3]=255}
-    else if(sh(px,py)){q[k]=60;q[k+1]=14;q[k+2]=10;q[k+3]=255}}
-  x.putImageData(o,0,0);
-  [[96,4],[118,9],[138,3]].forEach(([a,b])=>{x.fillStyle='#000';const R=(p,r,w,h)=>x.fillRect(p*K,r*K,w*K,h*K);R(a,b,4,2);R(a-2,b-1,2,1);R(a+4,b-1,2,1);R(a-3,b-2,1,1);R(a+6,b-2,1,1)});
+function titleLogo(){const dpr=Math.min(3,Math.max(2,window.devicePixelRatio||1)),W=Math.round(520*dpr),H=Math.round(W*64/150),s=W/150,c=document.createElement('canvas');c.width=W;c.height=H;c.style.imageRendering='auto';const x=c.getContext('2d');
+  x.font="400 "+(25*s)+"px 'Black Han Sans','Do Hyeon',sans-serif";x.textBaseline='alphabetic';x.lineJoin='round';x.miterLimit=2;
+  const SP=.8*s,L1=[['479','#e0822f'],['에서','#f2ece0']],L2=[['뜻밖의 야근','#f2ece0']];
+  const lay=(parts,x0,y0)=>{const out=[];let cx=x0;parts.forEach(([t,col],pi)=>{if(pi)cx+=2*s;for(const ch of t){out.push([ch,cx,y0,col]);cx+=x.measureText(ch).width+(ch===' '?0:SP)}});return out};
+  const G=lay(L1,4*s,27*s).concat(lay(L2,4*s,57*s));
+  G.forEach(([ch,a,b])=>{x.fillStyle='#3c0e0a';x.strokeStyle='#3c0e0a';x.lineWidth=2.4*s;x.strokeText(ch,a+1.6*s,b+1.6*s);x.fillText(ch,a+1.6*s,b+1.6*s)});
+  G.forEach(([ch,a,b])=>{x.strokeStyle='#080606';x.lineWidth=2.4*s;x.strokeText(ch,a,b)});
+  G.forEach(([ch,a,b,col])=>{x.fillStyle=col;x.fillText(ch,a,b)});
+  G.forEach(([ch,a,b])=>{x.save();x.beginPath();x.rect(0,b-25*s,W,6*s);x.clip();x.globalAlpha=.18;x.fillStyle='#ffffff';x.fillText(ch,a,b);x.restore()});
+  [[96,4],[118,9],[138,3]].forEach(([a,b])=>{x.fillStyle='#000';const R=(p,r,w,h)=>x.fillRect(p*s,r*s,w*s,h*s);R(a,b,4,2);R(a-2,b-1,2,1);R(a+4,b-1,2,1);R(a-3,b-2,1,1);R(a+6,b-2,1,1)});
   return c}
 function title(){
   paused=true;const s=$('#screen');s.hidden=false;s.innerHTML='';const inn=el('div','inner');
   const ta=titleArt();ta.className='titleart';inn.appendChild(ta);let tc=0;ta.onclick=()=>{if(++tc>=5){tc=0;devPanel()}};if(window.DEVBUILD){const dv=el('button','btn dev-btn','개발자 모드: 스테이지 이동');dv.onclick=()=>{aInit();devPanel()};inn.appendChild(dv)}
   const h1=el('h1','ttl','<span class="tlogo-fb"><span class="t479">479</span>에서<br>뜻밖의 야근</span><small>479타워. 퇴근 처리되지 않은 밤.</small>');inn.appendChild(h1);
   const mk=()=>{try{const lg=titleLogo();lg.className='tlogo';const fb=h1.querySelector('.tlogo-fb');if(fb)fb.replaceWith(lg)}catch(e){}};
-  (document.fonts&&document.fonts.load?Promise.race([document.fonts.load('40px "Black Han Sans"'),new Promise(r=>setTimeout(r,1500))]):Promise.resolve()).then(mk,mk);
+  (document.fonts&&document.fonts.load?Promise.race([document.fonts.load('40px "Black Han Sans"'),new Promise(r=>setTimeout(r,4000))]):Promise.resolve()).then(mk,mk);
   inn.appendChild(el('p','note','이어폰을 끼고 플레이하면 더욱 몰입도 있는 플레이가 가능합니다.'));
   const sv=load(SAVE);
   if(sv&&sv.started&&!sv.done){const c=el('button','btn','이어서 하기');c.onclick=()=>{aInit();S=Object.assign(fresh(),sv);heal();applyMe(S.me);s.hidden=true;paused=false;if(S.night)drone();render();renderDlgFromLog()};inn.appendChild(c);
